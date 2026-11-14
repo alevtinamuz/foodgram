@@ -2,6 +2,10 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import F, Q
 
+from .constants import (
+    EMAIL_MAX_LENGTH, FIRST_NAME_MAX_LENGTH, LAST_NAME_MAX_LENGTH,
+)
+
 
 class User(AbstractUser):
     """
@@ -15,10 +19,10 @@ class User(AbstractUser):
     """
 
     email = models.EmailField(
-        'Адрес электронной почты', max_length=254, unique=True
+        'Адрес электронной почты', max_length=EMAIL_MAX_LENGTH, unique=True
     )
-    first_name = models.CharField('Имя', max_length=150)
-    last_name = models.CharField('Фамилия', max_length=150)
+    first_name = models.CharField('Имя', max_length=FIRST_NAME_MAX_LENGTH)
+    last_name = models.CharField('Фамилия', max_length=LAST_NAME_MAX_LENGTH)
     avatar = models.ImageField(
         'Аватар', upload_to='users/', null=True, blank=True
     )
@@ -29,7 +33,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
-        ordering = ('id',)
+        ordering = ('username',)
 
     def __str__(self):
         return self.username
@@ -60,7 +64,7 @@ class Subscription(models.Model):
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
-        ordering = ('id',)
+        ordering = ('user__username', 'author__username')
         constraints = [
             models.UniqueConstraint(
                 fields=('user', 'author'), name='unique_subscription'
